@@ -1,0 +1,2356 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0805">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StageCraft">
+<meta name="description" content="Theatre Audio Composer — Panel komposer suara teater profesional">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>STAGECRAFT</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Courier+Prime:wght@400;700&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0a0805;
+  --bg2:    #110e09;
+  --bg3:    #1a1510;
+  --gold:   #c9a84c;
+  --gold2:  #e8c96a;
+  --red:    #8b1a1a;
+  --red2:   #c0392b;
+  --cream:  #f0e6d0;
+  --muted:  #6b5d4a;
+  --text:   #e8dcc8;
+  --border: #2a2218;
+  --bdr2:   #3d3020;
+  --green2: #3ea87a;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;touch-action:manipulation}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+/* ── CONNECTION BANNER ── */
+.conn-banner{display:none;align-items:center;gap:10px;padding:10px 16px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);position:relative;z-index:50;flex-shrink:0}
+.conn-banner.show{display:flex}
+.conn-banner.banner-error{background:rgba(139,26,26,.15);border-bottom-color:var(--red2);color:#e57373}
+.conn-banner.banner-warn{background:rgba(201,168,76,.08);border-bottom-color:var(--gold);color:var(--gold2)}
+.conn-banner.banner-ok{background:rgba(62,168,122,.08);border-bottom-color:var(--green2);color:var(--green2)}
+.conn-banner-icon{font-size:14px;flex-shrink:0}
+.conn-banner-msg{flex:1;line-height:1.4}
+.conn-banner-close{background:none;border:none;color:inherit;cursor:pointer;font-size:16px;opacity:.6;padding:2px 6px;flex-shrink:0}
+.conn-banner-close:hover{opacity:1}
+.conn-banner-retry{background:none;border:1px solid currentColor;color:inherit;cursor:pointer;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;padding:4px 8px;text-transform:uppercase;flex-shrink:0;transition:all .2s}
+/* ── AUTH SCREEN ── */
+.auth-screen{position:fixed;inset:0;background:var(--bg);z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.auth-screen.hidden{display:none}
+.auth-logo{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;letter-spacing:8px;color:var(--gold2);text-shadow:0 0 30px rgba(201,168,76,.3);margin-bottom:6px;text-align:center}
+.auth-logo span{color:var(--red2)}
+.auth-tagline{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:40px;text-align:center}
+.auth-card{width:100%;max-width:360px;background:var(--bg3);border:1px solid var(--bdr2);border-top:2px solid var(--gold);padding:28px 24px}
+.auth-tabs{display:flex;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.auth-tab{flex:1;padding:10px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.auth-form{display:flex;flex-direction:column;gap:0}
+.auth-form.hidden{display:none}
+.auth-field{margin-bottom:14px}
+.auth-label{display:block;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.auth-input{width:100%;background:var(--bg);border:1px solid var(--bdr2);padding:11px 14px;color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:var(--gold)}
+.auth-btn{width:100%;background:var(--gold);border:none;color:var(--bg);padding:13px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;margin-top:4px}
+.auth-btn:active{background:var(--gold2)}
+.auth-btn:disabled{opacity:.4;cursor:not-allowed}
+.auth-err{font-family:'Courier Prime',monospace;font-size:10px;color:var(--red2);letter-spacing:1px;text-align:center;margin-top:10px;min-height:16px}
+.auth-conn-status{display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:16px;border:1px solid var(--border);background:var(--bg);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.auth-conn-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:all .4s}
+.auth-conn-dot.checking{background:var(--gold);animation:sb-pulse .8s ease-in-out infinite}
+.auth-conn-dot.ok{background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.auth-conn-dot.err{background:var(--red2);box-shadow:0 0 6px var(--red2)}
+/* ── APP ── */
+.app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
+.app.hidden{display:none}
+/* ── TOPBAR ── */
+.topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bdr2);position:relative;z-index:10}
+.topbar::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.35}
+.app-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:5px;color:var(--gold2);text-shadow:0 0 20px rgba(201,168,76,.3)}
+.app-logo span{color:var(--red2)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.vol-row{display:flex;align-items:center;gap:6px}
+.vol-label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;height:3px;background:var(--bdr2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--gold);border-radius:50%}
+#masterVol{width:60px}
+.stop-all-btn{background:var(--red);border:1px solid var(--red2);color:#fff;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;padding:6px 10px;cursor:pointer;transition:all .2s}
+.stop-all-btn:active{background:var(--red2);transform:scale(.96)}
+.user-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;padding:6px 10px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.user-btn:active{border-color:var(--gold);color:var(--gold)}
+/* ── SUPABASE INDICATOR ── */
+.sb-indicator{display:flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:border-color .2s}
+.sb-indicator:hover{border-color:var(--gold)}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:all .4s}
+.sb-dot.ok{background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.sb-dot.err{background:var(--red2);box-shadow:0 0 6px var(--red2)}
+.sb-dot.loading{background:var(--gold);box-shadow:0 0 6px var(--gold);animation:sb-pulse .8s ease-in-out infinite}
+@keyframes sb-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-label{font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+/* ── TABS ── */
+.tabs{flex-shrink:0;display:flex;background:var(--bg2);border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:10px 4px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab .tab-icon{font-size:16px}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+/* ── PAGES ── */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;-webkit-overflow-scrolling:touch}
+.page.active{display:flex}
+.page::-webkit-scrollbar{display:none}
+/* ── LIBRARY PAGE ── */
+.upload-page{padding:16px;gap:16px}
+.upload-zone{border:1px dashed var(--bdr2);border-radius:6px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .3s;background:var(--bg2)}
+.upload-zone.dragover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.upload-zone-icon{font-size:36px;margin-bottom:10px;display:block}
+.upload-zone-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);margin-bottom:6px}
+.upload-zone-sub{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+#fileInput{display:none}
+.lib-header{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.lib-title{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.lib-count{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.lib-list{display:flex;flex-direction:column;gap:8px}
+.lib-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border:1px solid var(--border);transition:all .2s}
+.lib-item-color{width:4px;height:40px;border-radius:2px;flex-shrink:0}
+.lib-item-info{flex:1;min-width:0}
+.lib-item-name{font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.lib-item-meta{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.lib-item-trim{font-family:'Courier Prime',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;margin-top:2px}
+.lib-item-actions{display:flex;gap:6px}
+.btn-icon{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 10px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-icon:active{color:var(--gold);border-color:var(--gold)}
+.btn-icon.danger:active{color:var(--red2);border-color:var(--red2)}
+.lib-empty{text-align:center;padding:32px 16px;opacity:.4}
+.lib-empty-icon{font-size:32px;margin-bottom:8px}
+.lib-empty-text{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+/* ── STAGE PAGE ── */
+.stage-page{padding:12px;gap:12px}
+.mode-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mode-btn{flex:1;min-width:80px;background:var(--bg3);border:1px solid var(--bdr2);color:var(--text);padding:9px 8px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center}
+.mode-btn.active{background:var(--gold);border-color:var(--gold);color:var(--bg);box-shadow:0 0 12px rgba(201,168,76,.3)}
+.mode-indicator{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);padding:4px 8px;border:1px solid rgba(201,168,76,.25);background:rgba(201,168,76,.05);text-transform:uppercase;white-space:nowrap}
+.stage-grid-title{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.stage-grid-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+/* ── FOLDER SYSTEM ── */
+.folder-section{margin-bottom:16px}
+.folder-header{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--bdr2);cursor:pointer;transition:all .2s;user-select:none}
+.folder-header:active{border-color:var(--gold)}
+.folder-color-bar{width:3px;height:28px;border-radius:2px;flex-shrink:0}
+.folder-icon{font-size:16px;transition:transform .2s}
+.folder-icon.open{transform:rotate(90deg)}
+.folder-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream);flex:1}
+.folder-count{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.folder-actions{display:flex;gap:4px}
+.folder-body{overflow:hidden;transition:max-height .3s ease;max-height:0}
+.folder-body.open{max-height:2000px}
+.folder-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px 0 0 0}
+.folder-add-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border:1px dashed var(--bdr2);background:none;color:var(--muted);font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;width:100%;margin-top:8px}
+.folder-add-btn:active{border-color:var(--gold);color:var(--gold)}
+.unfiled-section{margin-top:8px}
+/* ── AUDIO BUTTON ── */
+.audio-btn{position:relative;border:none;padding:0;cursor:pointer;background:none;text-align:left;outline:none;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.audio-btn:active{transform:scale(.97)}
+.audio-btn-inner{padding:14px 14px 10px;border:1px solid var(--bdr2);background:var(--bg2);transition:all .15s;position:relative;overflow:hidden}
+.audio-btn.playing .audio-btn-inner{border-color:var(--btn-color,var(--gold));background:rgba(201,168,76,.05);box-shadow:0 0 0 1px var(--btn-color,var(--gold))}
+.audio-btn.looping .audio-btn-inner{animation:pulse-bdr 1.4s ease-in-out infinite}
+@keyframes pulse-bdr{0%,100%{box-shadow:0 0 0 1px var(--btn-color,var(--gold)),0 0 8px rgba(201,168,76,.1)}50%{box-shadow:0 0 0 2px var(--btn-color,var(--gold)),0 0 20px rgba(201,168,76,.3)}}
+.btn-color-bar{position:absolute;top:0;left:0;right:0;height:3px;background:var(--btn-color,var(--gold))}
+.btn-num-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.btn-num{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:2px}
+.btn-status-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:all .2s}
+.audio-btn.playing .btn-status-dot{background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.audio-btn.looping .btn-status-dot{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+.btn-label{font-family:'Playfair Display',serif;font-size:14px;color:var(--cream);font-weight:700;line-height:1.3;margin-bottom:4px;word-break:break-word}
+.btn-trim-tag{font-family:'Courier Prime',monospace;font-size:8px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;opacity:.8}
+.btn-wave{height:18px;display:flex;align-items:center;gap:2px;margin-bottom:4px}
+.wave-bar{width:2px;background:var(--btn-color,var(--gold));border-radius:1px;opacity:.3;transition:opacity .2s}
+.audio-btn.playing .wave-bar{opacity:.7;animation:wave .8s ease-in-out infinite}
+.audio-btn.looping .wave-bar{opacity:.9;animation:wave .6s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(2.5)}}
+.wave-bar:nth-child(2){animation-delay:.1s}.wave-bar:nth-child(3){animation-delay:.2s}
+.wave-bar:nth-child(4){animation-delay:.3s}.wave-bar:nth-child(5){animation-delay:.15s}
+.btn-vol-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.btn-vol-icon{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted)}
+.btn-vol-slider{flex:1;height:2px;background:rgba(255,255,255,.1);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;border-radius:1px}
+.btn-vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:var(--btn-color,var(--gold));border-radius:50%;cursor:pointer}
+.btn-vol-val{font-family:'Courier Prime',monospace;font-size:8px;color:var(--muted);min-width:24px;text-align:right}
+.btn-footer{display:flex;align-items:center;justify-content:space-between}
+.btn-duration{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.btn-mode-tag{font-family:'Courier Prime',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.loop-badge{background:var(--gold);color:var(--bg);font-family:'Courier Prime',monospace;font-size:8px;padding:1px 4px;font-weight:bold;display:none}
+.audio-btn.looping .loop-badge{display:inline}
+.playhead{position:absolute;bottom:0;left:0;height:2px;background:var(--btn-color,var(--gold));width:0%;transition:width linear;opacity:.6}
+.audio-btn.uploading .audio-btn-inner{opacity:.6}
+.upload-progress-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--gold);width:0%;transition:width .3s}
+.stage-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;opacity:.4}
+.stage-empty-icon{font-size:40px}
+.stage-empty-text{font-family:'Playfair Display',serif;font-size:16px;color:var(--muted);font-style:italic}
+.stage-empty-sub{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+/* ── MERGE PAGE ── */
+.merge-page{padding:16px;gap:16px}
+.merge-card{background:var(--bg2);border:1px solid var(--bdr2);padding:18px}
+.merge-card-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);margin-bottom:4px}
+.merge-card-sub{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.merge-hint{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.merge-queue-area{min-height:70px;border:1px dashed var(--bdr2);padding:12px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;transition:all .2s}
+.merge-queue-area.empty{align-items:center;justify-content:center}
+.merge-queue-hint{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;pointer-events:none}
+.merge-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg);border:1px solid var(--bdr2);font-size:12px;font-family:'Courier Prime',monospace;color:var(--text)}
+.merge-chip-color{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.merge-chip-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}
+.merge-chip-remove:active{color:var(--red2)}
+.merge-source-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.merge-source-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.merge-source-item.selected{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.merge-source-check{width:16px;height:16px;border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gold);flex-shrink:0;transition:all .2s}
+.merge-source-item.selected .merge-source-check{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+/* ── FORM ── */
+.form-label{display:block;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--bdr2);padding:10px 14px;color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;outline:none;transition:border-color .2s;margin-bottom:14px}
+.form-input:focus{border-color:var(--gold)}
+.color-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.color-opt{aspect-ratio:1;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+.color-opt.selected{border-color:#fff;transform:scale(1.1)}
+.color-opt.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:bold}
+.btn-primary{width:100%;background:var(--gold);border:none;color:var(--bg);padding:13px;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.btn-primary:active{background:var(--gold2);transform:scale(.99)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.progress-wrap{background:var(--border);height:3px;margin-top:10px;display:none}
+.progress-fill{height:100%;background:var(--gold);width:0%;transition:width .3s}
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);padding:0 0 var(--safe-bot)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--bdr2);border-top:2px solid var(--gold);width:100%;max-width:500px;padding:24px 20px;max-height:92vh;overflow-y:auto;animation:slide-up .3s ease}
+@keyframes slide-up{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2);margin-bottom:4px}
+.modal-sub{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.preview-bar{background:var(--bg2);border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.preview-filename{font-family:'Courier Prime',monospace;font-size:11px;color:var(--gold);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-preview{background:none;border:1px solid var(--muted);color:var(--muted);padding:5px 10px;font-family:'Courier Prime',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.btn-preview:active{border-color:var(--gold);color:var(--gold)}
+.mode-row{display:flex;gap:8px;margin-bottom:18px}
+.mode-opt{flex:1;background:var(--bg2);border:1px solid var(--bdr2);color:var(--muted);padding:9px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;text-align:center;transition:all .2s;text-transform:uppercase}
+.mode-opt.active{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.modal-actions{display:flex;gap:10px;margin-top:6px}
+.btn-cancel{background:none;border:1px solid var(--bdr2);color:var(--muted);padding:12px 18px;font-family:'Courier Prime',monospace;font-size:10px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.btn-cancel:active{border-color:var(--muted);color:var(--text)}
+.btn-confirm{flex:1;background:var(--gold);border:none;color:var(--bg);padding:12px;font-family:'Playfair Display',serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:2px;transition:all .2s}
+.btn-confirm:active{background:var(--gold2)}
+.folder-select-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.folder-sel-opt{flex:1;min-width:80px;background:var(--bg2);border:1px solid var(--bdr2);color:var(--muted);padding:8px 6px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;text-align:center;transition:all .2s;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-sel-opt.active{background:var(--bdr2);border-color:var(--gold);color:var(--gold)}
+/* ── AUDIO EDITOR ── */
+.editor-section{margin-bottom:18px}
+.editor-title{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.waveform-container{position:relative;background:var(--bg);border:1px solid var(--bdr2);height:80px;margin-bottom:12px;overflow:hidden;touch-action:none}
+.waveform-canvas{width:100%;height:100%;display:block}
+.trim-overlay{position:absolute;top:0;height:100%;background:rgba(201,168,76,.12);border-left:2px solid var(--gold);border-right:2px solid var(--gold);pointer-events:none}
+.trim-handle{position:absolute;top:0;width:22px;height:100%;background:rgba(201,168,76,.7);cursor:ew-resize;display:flex;align-items:center;justify-content:center;pointer-events:all}
+.trim-handle-left{left:-11px}
+.trim-handle-right{right:-11px}
+.trim-handle-line{width:2px;height:50%;background:var(--bg);border-radius:1px}
+.trim-info-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.trim-field{flex:1}
+.trim-field-label{font-family:'Courier Prime',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.trim-input{width:100%;background:var(--bg);border:1px solid var(--bdr2);padding:7px 10px;color:var(--text);font-family:'Courier Prime',monospace;font-size:13px;outline:none;text-align:center;transition:border-color .2s}
+.trim-input:focus{border-color:var(--gold)}
+.trim-duration-display{font-family:'Courier Prime',monospace;font-size:10px;color:var(--gold);text-align:center;padding:6px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);letter-spacing:1px}
+.trim-btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-secondary{flex:1;background:var(--bg2);border:1px solid var(--bdr2);color:var(--muted);padding:8px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase;text-align:center}
+.btn-secondary:active{border-color:var(--gold);color:var(--gold)}
+/* ── SHEET ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;display:none;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bot)}
+.sheet-overlay.active{display:flex}
+.sheet{background:var(--bg3);border:1px solid var(--bdr2);border-top:2px solid var(--gold);width:100%;max-width:500px;padding:8px 0 12px;animation:slide-up .25s ease}
+.sheet-title{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:8px 20px 14px}
+.sheet-item{display:flex;align-items:center;gap:12px;padding:14px 20px;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:1px;color:var(--text);text-transform:uppercase}
+.sheet-item:active{background:rgba(201,168,76,.08)}
+.sheet-item.danger{color:var(--red2)}
+.sheet-item .si-icon{font-size:16px;width:22px;text-align:center}
+.sheet-divider{height:1px;background:var(--border);margin:4px 0}
+/* ── STATUSBAR ── */
+.statusbar{flex-shrink:0;padding:6px 16px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green2);box-shadow:0 0 5px var(--green2);flex-shrink:0}
+.status-txt{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-count{font-family:'Courier Prime',monospace;font-size:9px;color:var(--gold);letter-spacing:1px}
+/* ── TOAST ── */
+.toast-wrap{position:fixed;top:calc(var(--safe-top) + 60px);left:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--bg3);border:1px solid var(--bdr2);border-left:3px solid var(--gold);padding:10px 14px;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:1px;color:var(--text);transition:all .3s}
+.toast.success{border-left-color:var(--green2)}
+.toast.error{border-left-color:var(--red2)}
+/* ── SPINNER ── */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bdr2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── DIAG MODAL ── */
+.diag-modal{background:var(--bg3);border:1px solid var(--bdr2);border-top:2px solid var(--gold);width:100%;max-width:500px;padding:24px 20px;max-height:80vh;overflow-y:auto;animation:slide-up .3s ease}
+.diag-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.diag-row:last-child{border-bottom:none}
+.diag-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.diag-key{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.diag-val{font-family:'Courier Prime',monospace;font-size:11px;color:var(--text);word-break:break-all}
+.diag-val.ok{color:var(--green2)}
+.diag-val.err{color:var(--red2)}
+.diag-val.warn{color:var(--gold)}
+</style>
+</head>
+<body>
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-logo">STAGE<span>CRAFT</span></div>
+  <div class="auth-tagline">Theatre Audio Composer</div>
+  <div class="auth-card">
+    <div class="auth-conn-status" id="authConnStatus">
+      <div class="auth-conn-dot checking" id="authConnDot"></div>
+      <span id="authConnMsg">Memeriksa koneksi server...</span>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Masuk</button>
+      <button class="auth-tab" id="authTabRegister" onclick="switchAuthTab('register')">Daftar Akun</button>
+    </div>
+    <div class="auth-form" id="loginForm">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="loginEmail" placeholder="email@anda.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="loginPassword" placeholder="Password..." autocomplete="current-password">
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">MASUK ✦</button>
+      <div class="auth-err" id="loginErr"></div>
+    </div>
+    <div class="auth-form hidden" id="registerForm">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="regEmail" placeholder="email@anda.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="regPassword" placeholder="Min. 6 karakter" autocomplete="new-password">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Konfirmasi Password</label>
+        <input type="password" class="auth-input" id="regPassword2" placeholder="Ulangi password..." autocomplete="new-password">
+      </div>
+      <button class="auth-btn" id="registerBtn" onclick="doRegister()">DAFTAR AKUN ✦</button>
+      <div class="auth-err" id="registerErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app hidden" id="mainApp">
+
+  <!-- CONNECTION BANNER -->
+  <div class="conn-banner" id="connBanner">
+    <span class="conn-banner-icon" id="connBannerIcon">⚠</span>
+    <span class="conn-banner-msg" id="connBannerMsg">Memeriksa koneksi...</span>
+    <button class="conn-banner-retry" id="connBannerRetry" onclick="retryConnection()" style="display:none">↺ COBA LAGI</button>
+    <button class="conn-banner-close" onclick="closeBanner()">✕</button>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="app-logo">STAGE<span>CRAFT</span></div>
+    <div class="topbar-right">
+      <div class="sb-indicator" id="sbIndicator" onclick="openDiagModal()" title="Klik untuk diagnosis koneksi">
+        <div class="sb-dot loading" id="sbDot"></div>
+        <span class="sb-label" id="sbLabel">DB...</span>
+      </div>
+      <div class="vol-row">
+        <span class="vol-label">VOL</span>
+        <input type="range" id="masterVol" min="0" max="1" step="0.05" value="0.8" oninput="setVol(this.value)">
+      </div>
+      <button class="stop-all-btn" onclick="stopAll()">■ STOP</button>
+      <button class="user-btn" id="userBtn" onclick="openUserSheet()">👤</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tab-upload" onclick="goTab('upload')">
+      <span class="tab-icon">📁</span>LIBRARY
+    </button>
+    <button class="tab" id="tab-stage" onclick="goTab('stage')">
+      <span class="tab-icon">🎭</span>STAGE
+    </button>
+    <button class="tab" id="tab-merge" onclick="goTab('merge')">
+      <span class="tab-icon">⊕</span>MERGE
+    </button>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages">
+
+    <!-- PAGE: LIBRARY -->
+    <div class="page active" id="page-upload">
+      <div class="upload-page">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <span class="upload-zone-icon">🎵</span>
+          <div class="upload-zone-title">Upload Audio MP3</div>
+          <div class="upload-zone-sub">Ketuk untuk pilih file</div>
+        </div>
+        <input type="file" id="fileInput" accept=".mp3,audio/*" multiple>
+        <div class="lib-header">
+          <span class="lib-title">Library Audio</span>
+          <span class="lib-count" id="libCount">0 file</span>
+        </div>
+        <div class="lib-list" id="libList">
+          <div class="lib-empty">
+            <div class="lib-empty-icon">🎼</div>
+            <div class="lib-empty-text">Belum ada audio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: STAGE -->
+    <div class="page" id="page-stage">
+      <div class="stage-page">
+        <div class="mode-bar">
+          <button class="mode-btn" id="modeBtnOnce" onclick="setGlobalMode('once')">▶ SEKALI</button>
+          <button class="mode-btn" id="modeBtnLoop" onclick="setGlobalMode('loop')">↻ ULANG</button>
+          <div class="mode-indicator" id="modeInd">BEBAS</div>
+        </div>
+        <div id="stageEmpty" class="stage-empty">
+          <div class="stage-empty-icon">🎭</div>
+          <div class="stage-empty-text">Stage Kosong</div>
+          <div class="stage-empty-sub">Upload audio di tab Library</div>
+        </div>
+        <div id="stageContent" style="display:none;flex-direction:column;gap:4px">
+          <div id="folderSections"></div>
+          <div id="unfiledSection" class="unfiled-section" style="display:none">
+            <div class="stage-grid-title" style="margin-bottom:8px">Tanpa Folder</div>
+            <div class="btn-grid" id="unfiledGrid"></div>
+          </div>
+          <button class="folder-add-btn" onclick="openFolderModal()">＋ TAMBAH FOLDER / BABAK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: MERGE -->
+    <div class="page" id="page-merge">
+      <div class="merge-page">
+        <div class="merge-card">
+          <div class="merge-card-title">⊕ Merge Composer</div>
+          <div class="merge-card-sub">Gabungkan audio menjadi satu tombol</div>
+          <div class="merge-hint">Pilih audio di bawah, susun urutan, lalu gabungkan menjadi satu tombol baru.</div>
+          <div class="form-label">Pilih Audio (min. 2)</div>
+          <div class="merge-source-list" id="mergeSourceList"></div>
+          <div class="form-label">Urutan Gabungan</div>
+          <div class="merge-queue-area empty" id="mergeQueueArea">
+            <span class="merge-queue-hint">Pilih audio di atas · · ·</span>
+          </div>
+          <div class="form-label">Nama Tombol Baru</div>
+          <input type="text" class="form-input" id="mergeLabelInput" placeholder="Nama tombol gabungan...">
+          <div class="form-label">Warna</div>
+          <div class="color-grid" id="mergeColorGrid"></div>
+          <button class="btn-primary" id="btnMergeExec" onclick="executeMerge()" disabled>⊕ GABUNGKAN AUDIO</button>
+          <div class="progress-wrap" id="mergeProgressWrap">
+            <div class="progress-fill" id="mergeProgressFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- STATUSBAR -->
+  <div class="statusbar">
+    <div class="status-dot" id="statusDot"></div>
+    <div class="status-txt" id="statusTxt">Memuat...</div>
+    <div class="status-count" id="statusCount"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODAL: UPLOAD CONFIRM -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <div class="modal-title">Konfirmasi Audio</div>
+    <div class="modal-sub">Atur detail tombol audio ini</div>
+    <div class="preview-bar">
+      <span class="preview-filename" id="modalFilename">—</span>
+      <button class="btn-preview" id="btnPreview" onclick="previewAudio()">▶ PREVIEW</button>
+    </div>
+    <div class="form-label">Nama / Label Tombol</div>
+    <input type="text" class="form-input" id="audioLabelInput" placeholder="Nama audio..." maxlength="40">
+    <div class="form-label">Folder / Babak</div>
+    <div class="folder-select-row" id="folderSelectRow"></div>
+    <div class="form-label">Mode Default</div>
+    <div class="mode-row">
+      <button class="mode-opt active" id="mOptOnce" onclick="selectModalMode('once')">▶ Sekali</button>
+      <button class="mode-opt" id="mOptLoop" onclick="selectModalMode('loop')">↻ Ulang</button>
+    </div>
+    <div class="form-label">Warna Tombol</div>
+    <div class="color-grid" id="modalColorGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">BATAL</button>
+      <button class="btn-confirm" onclick="confirmUpload()">TAMBAHKAN ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FOLDER -->
+<div class="modal-overlay" id="folderModal">
+  <div class="modal">
+    <div class="modal-title" id="folderModalTitle">＋ Tambah Folder</div>
+    <div class="modal-sub">Buat kelompok babak atau keperluan panggung</div>
+    <div class="form-label">Nama Folder / Babak</div>
+    <input type="text" class="form-input" id="folderNameInput" placeholder="Contoh: Babak 1, Intermission..." maxlength="30">
+    <div class="form-label">Warna Folder</div>
+    <div class="color-grid" id="folderColorGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeFolderModal()">BATAL</button>
+      <button class="btn-confirm" onclick="confirmFolder()">SIMPAN FOLDER ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AUDIO EDITOR -->
+<div class="modal-overlay" id="editorModal">
+  <div class="modal">
+    <div class="modal-title">✂ Editor Audio</div>
+    <div class="modal-sub" id="editorModalSub">Edit · Potong Audio</div>
+    <div class="editor-section">
+      <div class="editor-title">Waveform — Seret gagang kuning untuk memotong</div>
+      <div class="waveform-container" id="waveformContainer">
+        <canvas class="waveform-canvas" id="waveformCanvas"></canvas>
+        <div class="trim-overlay" id="trimOverlay">
+          <div class="trim-handle trim-handle-left" id="trimHandleLeft">
+            <div class="trim-handle-line"></div>
+          </div>
+          <div class="trim-handle trim-handle-right" id="trimHandleRight">
+            <div class="trim-handle-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="trim-info-row">
+        <div class="trim-field">
+          <div class="trim-field-label">Mulai (detik)</div>
+          <input type="number" class="trim-input" id="trimStartInput" min="0" step="0.1" value="0" oninput="trimInputChanged()">
+        </div>
+        <div style="padding-top:20px;color:var(--muted);font-size:18px">→</div>
+        <div class="trim-field">
+          <div class="trim-field-label">Selesai (detik)</div>
+          <input type="number" class="trim-input" id="trimEndInput" min="0" step="0.1" value="0" oninput="trimInputChanged()">
+        </div>
+      </div>
+      <div class="trim-duration-display" id="trimDurationDisplay">Durasi: 0:00</div>
+      <div class="trim-btn-row">
+        <button class="btn-secondary" onclick="resetTrim()">↺ Reset</button>
+        <button class="btn-secondary" onclick="previewTrim()">▶ Preview Potongan</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditor()">BATAL</button>
+      <button class="btn-confirm" onclick="applyTrim()">SIMPAN POTONGAN ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DIAGNOSIS KONEKSI -->
+<div class="modal-overlay" id="diagModal">
+  <div class="diag-modal">
+    <div class="modal-title">⚙ Diagnosis Koneksi</div>
+    <div class="modal-sub">Status koneksi Supabase & sistem</div>
+    <div id="diagContent">
+      <div class="diag-row">
+        <span class="diag-icon">⏳</span>
+        <div><div class="diag-key">Status</div>
+        <div class="diag-val warn">Memeriksa...</div></div>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-cancel" onclick="closeDiagModal()">TUTUP</button>
+      <button class="btn-confirm" onclick="runDiagnosis()">↺ CEK ULANG</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM SHEET: AUDIO OPTIONS -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-title" id="sheetTitle">— opsi —</div>
+    <button class="sheet-item" onclick="sheetAction('once')"><span class="si-icon">▶</span> Putar Sekali</button>
+    <button class="sheet-item" onclick="sheetAction('loop')"><span class="si-icon">↻</span> Putar Ulang</button>
+    <button class="sheet-item" onclick="sheetAction('stop')"><span class="si-icon">■</span> Stop</button>
+    <div class="sheet-divider"></div>
+    <button class="sheet-item" onclick="sheetAction('edit')"><span class="si-icon">✂</span> Edit / Potong Audio</button>
+    <button class="sheet-item" onclick="sheetAction('rename')"><span class="si-icon">✎</span> Ganti Nama</button>
+    <button class="sheet-item" onclick="sheetAction('moveFolder')"><span class="si-icon">📂</span> Pindah Folder</button>
+    <button class="sheet-item" onclick="sheetAction('addMerge')"><span class="si-icon">⊕</span> Tambah ke Merge</button>
+    <div class="sheet-divider"></div>
+    <button class="sheet-item danger" onclick="sheetAction('delete')"><span class="si-icon">✕</span> Hapus</button>
+  </div>
+</div>
+
+<!-- BOTTOM SHEET: USER -->
+<div class="sheet-overlay" id="userSheetOverlay" onclick="closeUserSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-title" id="userSheetEmail">— akun —</div>
+    <button class="sheet-item danger" onclick="doLogout()"><span class="si-icon">⇥</span> Keluar / Logout</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+// ============================================================
+//  STAGECRAFT v5 — Full Supabase
+// ============================================================
+const SB_URL = 'https://obgmvkhesftxsfoukuhm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9iZ212a2hlc2Z0eHNmb3VrdWhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTk4MTEsImV4cCI6MjA5MzE3NTgxMX0.eYfXRpjAz36brpn7jVtHDLexomAuENmKW7dmuZl1dX8';
+
+let currentUser  = null;
+let authToken    = null;
+
+// ============================================================
+//  CONNECTION SYSTEM
+// ============================================================
+function hasInternet() { return navigator.onLine; }
+
+async function pingSupabase() {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 7000);
+  try {
+    const res = await fetch(SB_URL + '/auth/v1/settings', {
+      method: 'GET',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY },
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    return { ok: res.status === 200 || res.status === 400, status: res.status };
+  } catch(e) {
+    clearTimeout(tid);
+    if (e.name === 'AbortError') return { ok: false, status: 'TIMEOUT', msg: 'Timeout >7 detik' };
+    return { ok: false, status: 'NETWORK_ERR', msg: e.message };
+  }
+}
+
+async function pingSupabaseAuth() {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 7000);
+  try {
+    const res = await fetch(SB_URL + '/auth/v1/settings', {
+      method: 'GET',
+      headers: { 'apikey': SB_KEY },
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    return { ok: res.ok, status: res.status };
+  } catch(e) {
+    clearTimeout(tid);
+    return { ok: false, status: 'NETWORK_ERR', msg: e.message };
+  }
+}
+
+async function pingSupabaseStorage() {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 7000);
+  try {
+    const res = await fetch(SB_URL + '/storage/v1/bucket', {
+      method: 'GET',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + (authToken || SB_KEY) },
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    return { ok: res.ok || res.status === 400, status: res.status };
+  } catch(e) {
+    clearTimeout(tid);
+    return { ok: false, status: 'NETWORK_ERR', msg: e.message };
+  }
+}
+
+async function pingSupabaseDB() {
+  if (!authToken) return { ok: false, status: 'NO_TOKEN', msg: 'Belum login' };
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 7000);
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/folders?select=id&limit=1', {
+      method: 'GET',
+      headers: {
+        'apikey':        SB_KEY,
+        'Authorization': 'Bearer ' + authToken,
+        'Accept':        'application/json'
+      },
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    return { ok: res.ok, status: res.status };
+  } catch(e) {
+    clearTimeout(tid);
+    return { ok: false, status: 'NETWORK_ERR', msg: e.message };
+  }
+}
+
+// ── DIAGNOSIS MODAL ──
+async function runDiagnosis() {
+  const content = document.getElementById('diagContent');
+  content.innerHTML = `<div class="diag-row"><span class="diag-icon">⏳</span>
+    <div><div class="diag-key">Status</div>
+    <div class="diag-val warn">Sedang memeriksa semua koneksi...</div></div></div>`;
+  const results = [];
+
+  // 1. Internet
+  const internet = hasInternet();
+  results.push({
+    icon: internet ? '✅' : '❌',
+    key: 'Koneksi Internet (Browser)',
+    val: internet ? 'Terhubung' : 'TIDAK ADA KONEKSI — Periksa WiFi atau data seluler',
+    state: internet ? 'ok' : 'err'
+  });
+  renderDiagResults(results);
+  if (!internet) {
+    showBanner('error', '❌ Tidak ada koneksi internet.', true);
+    return;
+  }
+
+  // 2. Supabase Server
+  results.push({ icon: '⏳', key: 'Supabase Server', val: 'Memeriksa...', state: 'warn' });
+  renderDiagResults(results);
+  const ping = await pingSupabase();
+  results[1] = {
+    icon: ping.ok ? '✅' : '❌',
+    key: 'Supabase Server',
+    val: ping.ok
+      ? 'Online (HTTP ' + ping.status + ')'
+      : ping.status === 'TIMEOUT'
+        ? 'TIMEOUT — Server lambat atau tidak bisa dijangkau'
+        : ping.status === 'NETWORK_ERR'
+          ? 'NETWORK ERROR — ' + (ping.msg || '')
+          : 'HTTP ' + ping.status + ' — Server bermasalah',
+    state: ping.ok ? 'ok' : 'err'
+  };
+  renderDiagResults(results);
+
+  // 3. Auth Service
+  results.push({ icon: '⏳', key: 'Auth Service', val: 'Memeriksa...', state: 'warn' });
+  renderDiagResults(results);
+  const authPing = await pingSupabaseAuth();
+  results[2] = {
+    icon: authPing.ok ? '✅' : '⚠',
+    key: 'Supabase Auth Service',
+    val: authPing.ok
+      ? 'Aktif (HTTP ' + authPing.status + ')'
+      : 'Masalah Auth (HTTP ' + authPing.status + ')',
+    state: authPing.ok ? 'ok' : 'warn'
+  };
+  renderDiagResults(results);
+
+  // 4. Storage
+  results.push({ icon: '⏳', key: 'Storage Service', val: 'Memeriksa...', state: 'warn' });
+  renderDiagResults(results);
+  const storagePing = await pingSupabaseStorage();
+  results[3] = {
+    icon: storagePing.ok ? '✅' : '⚠',
+    key: 'Supabase Storage',
+    val: storagePing.ok
+      ? 'Aktif (HTTP ' + storagePing.status + ')'
+      : 'HTTP ' + storagePing.status + ' — Cek bucket policy',
+    state: storagePing.ok ? 'ok' : 'warn'
+  };
+  renderDiagResults(results);
+
+  // 5. Database (hanya jika sudah login)
+  if (authToken) {
+    results.push({ icon: '⏳', key: 'Database (REST)', val: 'Memeriksa...', state: 'warn' });
+    renderDiagResults(results);
+    const dbPing = await pingSupabaseDB();
+    results[4] = {
+      icon: dbPing.ok ? '✅' : '❌',
+      key: 'Database REST API',
+      val: dbPing.ok
+        ? 'Terhubung (HTTP ' + dbPing.status + ')'
+        : 'HTTP ' + dbPing.status + (dbPing.msg ? ' — ' + dbPing.msg : ''),
+      state: dbPing.ok ? 'ok' : 'err'
+    };
+    renderDiagResults(results);
+  }
+
+  // 6. Session info
+  results.push({
+    icon: currentUser ? '👤' : '⚪',
+    key: 'Status Login',
+    val: currentUser
+      ? 'Login sebagai: ' + (currentUser.email || currentUser.id)
+      : 'Belum login',
+    state: currentUser ? 'ok' : 'warn'
+  });
+
+  // 7. Audio data
+  results.push({
+    icon: '🎵',
+    key: 'Audio di Memory',
+    val: audioData.length + ' audio termuat',
+    state: audioData.length > 0 ? 'ok' : 'warn'
+  });
+
+  renderDiagResults(results);
+
+  const hasErr  = results.some(r => r.state === 'err');
+  const hasWarn = results.some(r => r.state === 'warn');
+  if (!hasErr && !hasWarn) {
+    showBanner('ok', '✦ Semua koneksi normal.', false);
+    setTimeout(() => closeBanner(), 3000);
+  } else if (hasErr) {
+    showBanner('error', '❌ Ada masalah koneksi — lihat diagnosis untuk detail.', true);
+  } else {
+    showBanner('warn', '⚠ Koneksi sebagian bermasalah.', true);
+  }
+}
+
+function renderDiagResults(results) {
+  document.getElementById('diagContent').innerHTML = results.map(r => `
+    <div class="diag-row">
+      <span class="diag-icon">${r.icon}</span>
+      <div style="flex:1">
+        <div class="diag-key">${r.key}</div>
+        <div class="diag-val ${r.state}">${r.val}</div>
+      </div>
+    </div>`).join('');
+}
+
+function showBanner(type, msg, showRetry) {
+  const banner = document.getElementById('connBanner');
+  const msgEl  = document.getElementById('connBannerMsg');
+  const retry  = document.getElementById('connBannerRetry');
+  const icon   = document.getElementById('connBannerIcon');
+  if (!banner) return;
+  banner.className = 'conn-banner show banner-' + type;
+  msgEl.textContent = msg;
+  retry.style.display = showRetry ? 'inline-block' : 'none';
+  icon.textContent = type === 'error' ? '❌' : type === 'warn' ? '⚠' : '✦';
+}
+function closeBanner() {
+  const b = document.getElementById('connBanner');
+  if (b) b.classList.remove('show');
+}
+async function retryConnection() {
+  closeBanner();
+  showBanner('warn', '↺ Mencoba koneksi ulang...', false);
+  setSbStatus('loading');
+  const ping = await pingSupabase();
+  if (ping.ok) {
+    setSbStatus('ok');
+    showBanner('ok', '✦ Koneksi berhasil!', false);
+    setTimeout(() => closeBanner(), 3000);
+    if (currentUser) restoreAll();
+  } else {
+    setSbStatus('err');
+    if (!hasInternet()) {
+      showBanner('error', '❌ Tidak ada koneksi internet.', true);
+    } else if (ping.status === 'TIMEOUT') {
+      showBanner('error', '❌ Koneksi timeout. Server lambat atau tidak bisa dijangkau.', true);
+    } else {
+      showBanner('error', '❌ Gagal koneksi Supabase (HTTP ' + ping.status + ').', true);
+    }
+  }
+}
+function openDiagModal() {
+  document.getElementById('diagModal').classList.add('active');
+  runDiagnosis();
+}
+function closeDiagModal() {
+  document.getElementById('diagModal').classList.remove('active');
+}
+
+async function checkAuthScreenConn() {
+  const dot = document.getElementById('authConnDot');
+  const msg = document.getElementById('authConnMsg');
+  if (!dot || !msg) return;
+  dot.className = 'auth-conn-dot checking';
+  msg.textContent = 'Memeriksa koneksi ke server...';
+  if (!hasInternet()) {
+    dot.className = 'auth-conn-dot err';
+    msg.textContent = '❌ Tidak ada koneksi internet.';
+    return;
+  }
+  const ping = await pingSupabase();
+  if (ping.ok) {
+    dot.className = 'auth-conn-dot ok';
+    msg.textContent = '✦ Server terhubung — Silakan login.';
+  } else {
+    dot.className = 'auth-conn-dot err';
+    msg.textContent = ping.status === 'TIMEOUT'
+      ? '❌ Timeout — Server lambat atau tidak bisa dijangkau.'
+      : '❌ Gagal koneksi server (HTTP ' + ping.status + ').';
+  }
+}
+
+function setupConnMonitor() {
+  window.addEventListener('online', () => {
+    setSbStatus('loading');
+    showBanner('warn', '↺ Internet kembali — menghubungkan ulang...', false);
+    setTimeout(() => retryConnection(), 1500);
+  });
+  window.addEventListener('offline', () => {
+    setSbStatus('err');
+    showBanner('error', '❌ Koneksi internet terputus. Periksa WiFi atau data seluler.', true);
+  });
+}
+
+// ============================================================
+//  SUPABASE FETCH
+// ============================================================
+async function sbFetch(path, opts = {}) {
+  if (!hasInternet()) {
+    showBanner('error', '❌ Tidak ada koneksi internet.', true);
+    throw new Error('NO_INTERNET');
+  }
+  const headers = {
+    'apikey':        SB_KEY,
+    'Content-Type':  'application/json',
+    'Accept':        'application/json'
+  };
+  if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  else           headers['Authorization'] = 'Bearer ' + SB_KEY;
+  if (opts.extraHeaders) {
+    Object.assign(headers, opts.extraHeaders);
+    delete opts.extraHeaders;
+  }
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/' + path, { ...opts, headers });
+    const txt = await res.text();
+    if (!res.ok) {
+      let errMsg = 'HTTP ' + res.status;
+      try {
+        const errObj = JSON.parse(txt);
+        errMsg = errObj.message || errObj.error || errMsg;
+      } catch(e) { errMsg += ': ' + txt.substring(0, 100); }
+      throw new Error(errMsg);
+    }
+    return txt ? JSON.parse(txt) : null;
+  } catch(e) {
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      showBanner('error', '❌ Gagal koneksi Supabase. Cek koneksi internet.', true);
+      setSbStatus('err');
+    }
+    throw e;
+  }
+}
+
+async function sbAuth(path, body) {
+  if (!hasInternet()) throw new Error('Tidak ada koneksi internet.');
+  try {
+    const res = await fetch(SB_URL + '/auth/v1/' + path, {
+      method:  'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Auth error');
+    return data;
+  } catch(e) {
+    if (e.name === 'TypeError') throw new Error('Gagal menjangkau server. Periksa koneksi internet.');
+    throw e;
+  }
+}
+
+async function sbStorageUpload(filePath, arrayBuffer, contentType) {
+  if (!hasInternet()) throw new Error('Tidak ada koneksi internet untuk upload.');
+  const res = await fetch(SB_URL + '/storage/v1/object/audio-files/' + filePath, {
+    method:  'POST',
+    headers: {
+      'apikey':        SB_KEY,
+      'Authorization': 'Bearer ' + authToken,
+      'Content-Type':  contentType || 'audio/mpeg',
+      'x-upsert':      'true'
+    },
+    body: arrayBuffer
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error('Upload gagal HTTP ' + res.status + ': ' + t.substring(0, 100));
+  }
+  return true;
+}
+
+function sbStorageUrl(filePath) {
+  return SB_URL + '/storage/v1/object/audio-files/' + filePath;
+}
+
+// ── Download file dengan fallback 3 metode ──
+async function downloadAudioFile(storagePath) {
+  const headers = {
+    'Authorization': 'Bearer ' + authToken,
+    'apikey':        SB_KEY
+  };
+
+  // Metode 1: authenticated endpoint
+  try {
+    const url = SB_URL + '/storage/v1/object/authenticated/audio-files/' + storagePath;
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 0) {
+        console.log('[DL] ✓ authenticated:', storagePath);
+        return buf;
+      }
+    }
+    console.warn('[DL] authenticated gagal HTTP', res.status);
+  } catch(e) {
+    console.warn('[DL] authenticated error:', e.message);
+  }
+
+  // Metode 2: direct object URL
+  try {
+    const url = SB_URL + '/storage/v1/object/audio-files/' + storagePath;
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 0) {
+        console.log('[DL] ✓ direct:', storagePath);
+        return buf;
+      }
+    }
+    console.warn('[DL] direct gagal HTTP', res.status);
+  } catch(e) {
+    console.warn('[DL] direct error:', e.message);
+  }
+
+  // Metode 3: signed URL
+  try {
+    const signRes = await fetch(
+      SB_URL + '/storage/v1/object/sign/audio-files/' + storagePath, {
+      method:  'POST',
+      headers: {
+        'apikey':        SB_KEY,
+        'Authorization': 'Bearer ' + authToken,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify({ expiresIn: 3600 })
+    });
+    if (signRes.ok) {
+      const signData = await signRes.json();
+      const signedUrl = signData.signedURL
+        ? (signData.signedURL.startsWith('http')
+            ? signData.signedURL
+            : SB_URL + '/storage/v1' + signData.signedURL)
+        : null;
+      if (signedUrl) {
+        const res = await fetch(signedUrl);
+        if (res.ok) {
+          const buf = await res.arrayBuffer();
+          if (buf.byteLength > 0) {
+            console.log('[DL] ✓ signed URL:', storagePath);
+            return buf;
+          }
+        }
+      }
+    }
+    console.warn('[DL] signed URL gagal');
+  } catch(e) {
+    console.warn('[DL] signed URL error:', e.message);
+  }
+
+  throw new Error('Semua metode download gagal untuk: ' + storagePath);
+}
+
+// ============================================================
+//  AUTH FUNCTIONS
+// ============================================================
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginErr');
+  const btn   = document.getElementById('loginBtn');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'Email dan password wajib diisi.'; return; }
+  if (!hasInternet()) { errEl.textContent = '❌ Tidak ada koneksi internet.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>MASUK...';
+  try {
+    const data  = await sbAuth('token?grant_type=password', { email, password: pass });
+    authToken   = data.access_token;
+    currentUser = data.user;
+    localStorage.setItem('sc_token', authToken);
+    localStorage.setItem('sc_user',  JSON.stringify(currentUser));
+    showApp();
+  } catch(e) {
+    let msg = e.message;
+    if (msg.includes('Invalid login') || msg.includes('invalid_grant')) msg = 'Email atau password salah.';
+    else if (msg.includes('internet') || msg.includes('fetch'))         msg = '❌ Gagal koneksi server.';
+    else if (msg.includes('Email not confirmed'))                        msg = 'Email belum dikonfirmasi.';
+    errEl.textContent = msg;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'MASUK ✦';
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('regEmail').value.trim();
+  const pass  = document.getElementById('regPassword').value;
+  const pass2 = document.getElementById('regPassword2').value;
+  const errEl = document.getElementById('registerErr');
+  const btn   = document.getElementById('registerBtn');
+  errEl.textContent = '';
+  if (!email || !pass)  { errEl.textContent = 'Email dan password wajib diisi.'; return; }
+  if (pass.length < 6)  { errEl.textContent = 'Password minimal 6 karakter.'; return; }
+  if (pass !== pass2)   { errEl.textContent = 'Konfirmasi password tidak cocok.'; return; }
+  if (!hasInternet())   { errEl.textContent = '❌ Tidak ada koneksi internet.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>MENDAFTAR...';
+  try {
+    const data  = await sbAuth('signup', { email, password: pass });
+    authToken   = data.access_token;
+    currentUser = data.user;
+    localStorage.setItem('sc_token', authToken);
+    localStorage.setItem('sc_user',  JSON.stringify(currentUser));
+    showApp();
+    toast('✦ Akun berhasil dibuat!', 'success');
+  } catch(e) {
+    let msg = e.message;
+    if (msg.includes('already registered') || msg.includes('already exists')) msg = 'Email sudah terdaftar.';
+    else if (msg.includes('internet') || msg.includes('fetch'))                msg = '❌ Gagal koneksi server.';
+    errEl.textContent = msg;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'DAFTAR AKUN ✦';
+  }
+}
+
+async function doLogout() {
+  closeUserSheet();
+  stopAll();
+  audioData   = [];
+  folders     = [];
+  authToken   = null;
+  currentUser = null;
+  localStorage.removeItem('sc_token');
+  localStorage.removeItem('sc_user');
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('authScreen').classList.remove('hidden');
+  closeBanner();
+  renderLibrary(); renderStage(); renderMergeSourceList(); updateCount();
+  setStatus('Logged out', 'ok');
+  setTimeout(() => checkAuthScreenConn(), 500);
+}
+
+function openUserSheet() {
+  if (currentUser) document.getElementById('userSheetEmail').textContent = currentUser.email || '—';
+  document.getElementById('userSheetOverlay').classList.add('active');
+}
+function closeUserSheet() { document.getElementById('userSheetOverlay').classList.remove('active'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('registerErr').textContent = '';
+}
+
+function showApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  if (currentUser) document.getElementById('userBtn').title = currentUser.email || '';
+  initApp();
+}
+
+function checkSession() {
+  const token = localStorage.getItem('sc_token');
+  const user  = localStorage.getItem('sc_user');
+  if (token && user) {
+    try {
+      authToken   = token;
+      currentUser = JSON.parse(user);
+      showApp();
+      return true;
+    } catch(e) {
+      localStorage.removeItem('sc_token');
+      localStorage.removeItem('sc_user');
+    }
+  }
+  return false;
+}
+
+// ============================================================
+//  CONSTANTS & STATE
+// ============================================================
+const COLORS = [
+  '#c9a84c','#e8c96a','#c0392b','#8e44ad',
+  '#2980b9','#27ae60','#e67e22','#1abc9c',
+  '#e91e63','#00bcd4','#ff5722','#607d8b'
+];
+
+let audioData          = [];
+let folders            = [];
+let pendingFile        = null;
+let pendingBuffer      = null;
+let pendingArrayBuf    = null;
+let pendingContentType = 'audio/mpeg';
+let pendingPreviewSrc  = null;
+let modalSelColor      = COLORS[0];
+let modalSelFolder     = null;
+let mergeSelColor      = COLORS[2];
+let folderSelColor     = COLORS[0];
+let modalMode          = 'once';
+let globalMode         = null;
+let masterVolume       = 0.8;
+let activeAudioSources = {};
+let sheetTargetId      = null;
+let mergeSelectedIds   = [];
+let audioCtx           = null;
+let editorTargetId     = null;
+let editorBuffer       = null;
+let editorDuration     = 0;
+let trimStart          = 0;
+let trimEnd            = 0;
+let editorPreviewSrc   = null;
+let editingFolderId    = null;
+let openFolderIds      = new Set();
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+// ============================================================
+//  TABS & UI HELPERS
+// ============================================================
+function goTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('page-' + name).classList.add('active');
+  if (name === 'merge') renderMergeSourceList();
+}
+
+function buildColors(containerId, current, cb) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = COLORS.map(c =>
+    `<div class="color-opt ${c===current?'selected':''}" style="background:${c}"
+      onclick="pickColor('${containerId}','${c}',this)"></div>`
+  ).join('');
+  el._cb = cb;
+}
+function pickColor(gridId, c, el) {
+  document.getElementById(gridId).querySelectorAll('.color-opt')
+    .forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(gridId)._cb(c);
+}
+
+// ── FOLDER MODAL ──
+function openFolderModal(id) {
+  editingFolderId = id || null;
+  const f = id ? folders.find(x => x.id === id) : null;
+  document.getElementById('folderModalTitle').textContent = f ? '✎ Edit Folder' : '＋ Tambah Folder';
+  document.getElementById('folderNameInput').value = f ? f.name : '';
+  folderSelColor = f ? f.color : COLORS[Math.floor(Math.random() * COLORS.length)];
+  buildColors('folderColorGrid', folderSelColor, c => folderSelColor = c);
+  document.getElementById('folderModal').classList.add('active');
+  setTimeout(() => document.getElementById('folderNameInput').focus(), 300);
+}
+function closeFolderModal() { document.getElementById('folderModal').classList.remove('active'); }
+
+async function confirmFolder() {
+  const name = document.getElementById('folderNameInput').value.trim();
+  if (!name) { toast('Nama folder wajib diisi', 'error'); return; }
+  if (editingFolderId) {
+    const f = folders.find(x => x.id === editingFolderId);
+    if (f) { f.name = name; f.color = folderSelColor; await sbSaveFolder(f); }
+  } else {
+    const f = { id: 'f_' + Date.now(), name, color: folderSelColor, sort_order: folders.length };
+    folders.push(f);
+    await sbSaveFolder(f);
+  }
+  closeFolderModal();
+  renderStage();
+  toast('✦ Folder disimpan', 'success');
+}
+
+async function deleteFolder(id) {
+  if (!confirm('Hapus folder ini? Audio di dalamnya akan menjadi tanpa folder.')) return;
+  audioData.forEach(a => { if (a.folderId === id) { a.folderId = null; sbSaveAudio(a); } });
+  folders = folders.filter(f => f.id !== id);
+  await sbDeleteFolder(id);
+  openFolderIds.delete(id);
+  renderStage(); renderLibrary();
+  toast('Folder dihapus', 'default');
+}
+
+function buildFolderSelect() {
+  const row  = document.getElementById('folderSelectRow');
+  const opts = [{ id: null, name: 'Tanpa Folder' }, ...folders];
+  row.innerHTML = opts.map(f =>
+    `<button class="folder-sel-opt ${modalSelFolder === f.id ? 'active' : ''}"
+      onclick="selectModalFolder('${f.id}')"
+      style="${f.id ? 'border-left:3px solid ' + f.color : ''}"
+    >${f.name}</button>`
+  ).join('');
+}
+function selectModalFolder(id) {
+  modalSelFolder = id === 'null' ? null : id;
+  buildFolderSelect();
+}
+
+// ── FILE INPUT ──
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+  const list = Array.from(files).filter(f => f.type.startsWith('audio/') || f.name.endsWith('.mp3'));
+  if (!list.length) { toast('Format tidak didukung', 'error'); return; }
+  list.forEach((f, i) => setTimeout(() => processSingle(f), i * 500));
+}
+
+function processSingle(file) {
+  pendingFile        = file;
+  pendingContentType = file.type || 'audio/mpeg';
+  const r = new FileReader();
+  r.onload = async e => {
+    try {
+      const arrBuf    = e.target.result;
+      pendingArrayBuf = arrBuf.slice(0);
+      const ctx       = getCtx();
+      pendingBuffer   = await ctx.decodeAudioData(arrBuf.slice(0));
+      openModal(file);
+    } catch(err) {
+      toast('Gagal memuat: ' + file.name, 'error');
+      console.error(err);
+    }
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function openModal(file) {
+  document.getElementById('modalFilename').textContent = file.name;
+  document.getElementById('audioLabelInput').value = file.name.replace(/\.[^.]+$/, '');
+  modalMode      = 'once';
+  modalSelFolder = null;
+  document.getElementById('mOptOnce').classList.add('active');
+  document.getElementById('mOptLoop').classList.remove('active');
+  modalSelColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+  buildColors('modalColorGrid', modalSelColor, c => modalSelColor = c);
+  buildFolderSelect();
+  document.getElementById('uploadModal').classList.add('active');
+  setTimeout(() => document.getElementById('audioLabelInput').focus(), 300);
+}
+
+function closeModal() {
+  document.getElementById('uploadModal').classList.remove('active');
+  if (pendingPreviewSrc) { try { pendingPreviewSrc.stop(); } catch(e){} pendingPreviewSrc = null; }
+  pendingFile = null; pendingBuffer = null; pendingArrayBuf = null;
+  fileInput.value = '';
+  document.getElementById('btnPreview').textContent = '▶ PREVIEW';
+}
+
+function selectModalMode(m) {
+  modalMode = m;
+  document.getElementById('mOptOnce').classList.toggle('active', m === 'once');
+  document.getElementById('mOptLoop').classList.toggle('active', m === 'loop');
+}
+
+function previewAudio() {
+  if (!pendingBuffer) return;
+  if (pendingPreviewSrc) {
+    try { pendingPreviewSrc.stop(); } catch(e){}
+    pendingPreviewSrc = null;
+    document.getElementById('btnPreview').textContent = '▶ PREVIEW';
+    return;
+  }
+  const ctx = getCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = pendingBuffer;
+  const g = ctx.createGain();
+  g.gain.value = masterVolume;
+  src.connect(g); g.connect(ctx.destination); src.start();
+  pendingPreviewSrc = src;
+  document.getElementById('btnPreview').textContent = '■ STOP';
+  src.onended = () => {
+    pendingPreviewSrc = null;
+    document.getElementById('btnPreview').textContent = '▶ PREVIEW';
+  };
+}
+
+async function confirmUpload() {
+  const label = document.getElementById('audioLabelInput').value.trim()
+    || (pendingFile ? pendingFile.name : 'Audio');
+  if (!pendingBuffer || !pendingArrayBuf) { toast('Audio belum siap', 'error'); return; }
+  if (pendingPreviewSrc) { try { pendingPreviewSrc.stop(); } catch(e){} pendingPreviewSrc = null; }
+  if (!currentUser) { toast('Belum login', 'error'); return; }
+  const id          = 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+  const dur         = pendingBuffer.duration;
+  const storagePath = currentUser.id + '/' + id + '.mp3';
+  const entry = {
+    id, name: label, buffer: pendingBuffer,
+    duration: dur, color: modalSelColor, mode: modalMode,
+    trimStart: 0, trimEnd: dur, isMerged: false, sourceNames: null,
+    storagePath, folderId: modalSelFolder, volume: 1.0
+  };
+  audioData.push(entry);
+  closeModal();
+  renderLibrary(); renderStage(); renderMergeSourceList(); updateCount();
+  setStatus('↑ Mengupload ' + label + '...', 'processing');
+  try {
+    setSbStatus('loading');
+    await sbStorageUpload(storagePath, pendingArrayBuf, pendingContentType);
+    const ok = await sbSaveAudio(entry);
+    setSbStatus(ok ? 'ok' : 'err');
+    toast('✦ ' + label + (ok ? ' tersimpan ☁' : ' gagal sync'), ok ? 'success' : 'error');
+    setStatus('✦ ' + label + ' siap', 'ok');
+  } catch(e) {
+    toast('Gagal upload: ' + e.message, 'error');
+    showBanner('error', '❌ Gagal upload "' + label + '": ' + e.message.substring(0,60), true);
+    setSbStatus('err');
+    setStatus('Gagal upload ' + label, 'error');
+  }
+}
+
+// ── LIBRARY RENDER ──
+function renderLibrary() {
+  const el = document.getElementById('libList');
+  document.getElementById('libCount').textContent = audioData.length + ' file';
+  if (!audioData.length) {
+    el.innerHTML = `<div class="lib-empty">
+      <div class="lib-empty-icon">🎼</div>
+      <div class="lib-empty-text">Belum ada audio</div></div>`;
+    return;
+  }
+  el.innerHTML = audioData.map(a => {
+    const hasTrim = a.trimStart > 0 || a.trimEnd < a.duration;
+    const folder  = folders.find(f => f.id === a.folderId);
+    return `
+    <div class="lib-item">
+      <div class="lib-item-color" style="background:${a.color}"></div>
+      <div class="lib-item-info">
+        <div class="lib-item-name">${a.name}</div>
+        <div class="lib-item-meta">
+          ${fmtDur((a.trimEnd||a.duration)-(a.trimStart||0))} ·
+          ${a.mode==='loop'?'↻ ULANG':'▶ SEKALI'}
+          ${a.isMerged?' · GABUNGAN':''}
+          ${folder?' · 📂 '+folder.name:''}
+        </div>
+        ${hasTrim?`<div class="lib-item-trim">✂ ${fmtDur(a.trimStart)} → ${fmtDur(a.trimEnd)}</div>`:''}
+      </div>
+      <div class="lib-item-actions">
+        <button class="btn-icon" onclick="openEditor('${a.id}')">✂</button>
+        <button class="btn-icon" onclick="quickPreview('${a.id}')">▶</button>
+        <button class="btn-icon danger" onclick="deleteAudio('${a.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickPreview(id) {
+  const a = audioData.find(x => x.id === id);
+  if (!a || !a.buffer) return;
+  const ctx = getCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = a.buffer;
+  const g = ctx.createGain();
+  g.gain.value = masterVolume * (a.volume || 1.0) * 0.8;
+  src.connect(g); g.connect(ctx.destination);
+  const start = a.trimStart || 0;
+  const dur   = Math.min((a.trimEnd || a.duration) - start, 3);
+  src.start(0, start, dur);
+}
+
+async function deleteAudio(id) {
+  stopAudio(id, false);
+  const a = audioData.find(x => x.id === id);
+  audioData        = audioData.filter(x => x.id !== id);
+  mergeSelectedIds = mergeSelectedIds.filter(x => x !== id);
+  renderLibrary(); renderStage(); renderMergeSourceList(); updateCount();
+  toast('Audio dihapus', 'default');
+  if (a && a.storagePath) {
+    try {
+      await fetch(SB_URL + '/storage/v1/object/audio-files/' + a.storagePath, {
+        method:  'DELETE',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + authToken }
+      });
+    } catch(e) { console.warn('Storage delete failed:', e); }
+  }
+  await sbDeleteAudio(id);
+}
+
+// ── STAGE RENDER ──
+function renderStage() {
+  const empty   = document.getElementById('stageEmpty');
+  const content = document.getElementById('stageContent');
+  if (!audioData.length) {
+    empty.style.display   = 'flex';
+    content.style.display = 'none';
+    return;
+  }
+  empty.style.display   = 'none';
+  content.style.display = 'flex';
+  const folderSections = document.getElementById('folderSections');
+  folderSections.innerHTML = '';
+  folders.forEach(folder => {
+    const folderAudio = audioData.filter(a => a.folderId === folder.id);
+    const isOpen      = openFolderIds.has(folder.id);
+    const section     = document.createElement('div');
+    section.className = 'folder-section';
+    section.innerHTML = `
+      <div class="folder-header" onclick="toggleFolder('${folder.id}')">
+        <div class="folder-color-bar" style="background:${folder.color}"></div>
+        <span class="folder-icon ${isOpen?'open':''}">▶</span>
+        <span class="folder-name">${folder.name}</span>
+        <span class="folder-count">${folderAudio.length} audio</span>
+        <div class="folder-actions" onclick="event.stopPropagation()">
+          <button class="btn-icon" onclick="openFolderModal('${folder.id}')"
+            style="padding:4px 8px;font-size:11px">✎</button>
+          <button class="btn-icon danger" onclick="deleteFolder('${folder.id}')"
+            style="padding:4px 8px;font-size:11px">✕</button>
+        </div>
+      </div>
+      <div class="folder-body ${isOpen?'open':''}" id="fbody_${folder.id}">
+        <div class="btn-grid" id="fgrid_${folder.id}"></div>
+      </div>`;
+    folderSections.appendChild(section);
+    const grid = document.getElementById('fgrid_' + folder.id);
+    if (folderAudio.length) {
+      grid.innerHTML = folderAudio.map((a, i) => buildAudioBtn(a, i)).join('');
+    } else {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:12px;font-family:'Courier Prime',
+        monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;
+        text-align:center;opacity:.5">— Folder kosong —</div>`;
+    }
+  });
+  const unfiled    = audioData.filter(a => !a.folderId);
+  const unfiledSec = document.getElementById('unfiledSection');
+  const unfiledGrd = document.getElementById('unfiledGrid');
+  if (unfiled.length) {
+    unfiledSec.style.display = 'block';
+    unfiledGrd.innerHTML     = unfiled.map((a, i) => buildAudioBtn(a, i)).join('');
+  } else {
+    unfiledSec.style.display = 'none';
+    unfiledGrd.innerHTML     = '';
+  }
+  document.querySelectorAll('.audio-btn').forEach(btn => {
+    let timer;
+    btn.addEventListener('touchstart', () => {
+      timer = setTimeout(() => openSheet(btn.dataset.id), 600);
+    });
+    btn.addEventListener('touchend',  () => clearTimeout(timer));
+    btn.addEventListener('touchmove', () => clearTimeout(timer));
+  });
+}
+
+function toggleFolder(id) {
+  if (openFolderIds.has(id)) openFolderIds.delete(id);
+  else                        openFolderIds.add(id);
+  renderStage();
+}
+
+function buildAudioBtn(a, i) {
+  const waves   = Array(7).fill(0).map((_,wi) =>
+    `<div class="wave-bar" style="height:${Math.random()*12+4}px;
+      animation-delay:${wi*0.08}s"></div>`).join('');
+  const eff     = globalMode || a.mode;
+  const hasTrim = a.trimStart > 0 || a.trimEnd < a.duration;
+  const playDur = (a.trimEnd || a.duration) - (a.trimStart || 0);
+  const vol     = a.volume != null ? a.volume : 1.0;
+  const volPct  = Math.round(vol * 100);
+  return `
+  <button class="audio-btn" id="btn_${a.id}" data-id="${a.id}"
+    style="--btn-color:${a.color}" onclick="triggerAudio('${a.id}')">
+    <div class="audio-btn-inner">
+      <div class="btn-color-bar"></div>
+      <div class="btn-num-row">
+        <span class="btn-num">${String(i+1).padStart(2,'0')}</span>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span class="loop-badge">↻</span>
+          <div class="btn-status-dot"></div>
+        </div>
+      </div>
+      <div class="btn-label">${a.name}</div>
+      ${hasTrim?`<div class="btn-trim-tag">✂ ${fmtDur(a.trimStart)}→${fmtDur(a.trimEnd)}</div>`:''}
+      <div class="btn-wave">${waves}</div>
+      <div class="btn-vol-row" onclick="event.stopPropagation()">
+        <span class="btn-vol-icon">♪</span>
+        <input type="range" class="btn-vol-slider" min="0" max="1" step="0.05" value="${vol}"
+          oninput="setAudioVol('${a.id}',this.value,this.nextElementSibling)"
+          onchange="saveAudioVol('${a.id}')">
+        <span class="btn-vol-val">${volPct}%</span>
+      </div>
+      <div class="btn-footer">
+        <span class="btn-duration">${fmtDur(playDur)}</span>
+        <span class="btn-mode-tag">${eff==='loop'?'↻':'▶'}</span>
+      </div>
+      <div class="playhead" id="ph_${a.id}"></div>
+      <div class="upload-progress-bar" id="upbar_${a.id}"></div>
+    </div>
+  </button>`;
+}
+
+// ── VOLUME ──
+function setAudioVol(id, val, valEl) {
+  const a = audioData.find(x => x.id === id); if (!a) return;
+  a.volume = parseFloat(val);
+  if (valEl) valEl.textContent = Math.round(a.volume * 100) + '%';
+  if (activeAudioSources[id]?.gain)
+    activeAudioSources[id].gain.gain.value = masterVolume * a.volume;
+}
+let volSaveTimer = {};
+function saveAudioVol(id) {
+  clearTimeout(volSaveTimer[id]);
+  volSaveTimer[id] = setTimeout(async () => {
+    const a = audioData.find(x => x.id === id);
+    if (a) await sbSaveAudio(a);
+  }, 800);
+}
+
+// ── PLAYBACK ──
+function triggerAudio(id) {
+  const a = audioData.find(x => x.id === id); if (!a) return;
+  if (!a.buffer) { toast('Audio sedang dimuat...', 'default'); return; }
+  const eff = globalMode || a.mode;
+  const btn = document.getElementById('btn_' + id);
+  if (btn && (btn.classList.contains('playing') || btn.classList.contains('looping'))) {
+    stopAudio(id); return;
+  }
+  stopAudio(id, false);
+  const ctx = getCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = a.buffer;
+  src.loop   = eff === 'loop';
+  const g = ctx.createGain();
+  g.gain.value = masterVolume * (a.volume || 1.0);
+  src.connect(g); g.connect(ctx.destination);
+  const s = a.trimStart || 0, e = a.trimEnd || a.duration, dur = e - s;
+  if (eff === 'loop') { src.loopStart = s; src.loopEnd = e; src.start(0, s); }
+  else                { src.start(0, s, dur); }
+  activeAudioSources[id] = { source: src, gain: g };
+  if (btn) { btn.classList.remove('playing','looping'); btn.classList.add(eff==='loop'?'looping':'playing'); }
+  if (eff !== 'loop') animatePH(id, dur);
+  setStatus('▶ ' + a.name, 'playing');
+  src.onended = () => {
+    if (activeAudioSources[id]?.source === src) {
+      delete activeAudioSources[id];
+      if (btn) btn.classList.remove('playing','looping');
+      resetPH(id); setStatus('Selesai: ' + a.name, 'ok');
+    }
+  };
+}
+function stopAudio(id, msg=true) {
+  if (activeAudioSources[id]) {
+    try { activeAudioSources[id].source.stop(); } catch(e){}
+    delete activeAudioSources[id];
+  }
+  const btn = document.getElementById('btn_' + id);
+  if (btn) btn.classList.remove('playing','looping');
+  resetPH(id);
+  if (msg) setStatus('Dihentikan', 'ok');
+}
+function stopAll() {
+  Object.keys(activeAudioSources).forEach(id => stopAudio(id, false));
+  setStatus('■ Semua audio dihentikan', 'ok');
+}
+function setVol(v) {
+  masterVolume = parseFloat(v);
+  Object.keys(activeAudioSources).forEach(id => {
+    const a = audioData.find(x => x.id === id);
+    if (activeAudioSources[id]?.gain)
+      activeAudioSources[id].gain.gain.value = masterVolume * (a?.volume || 1.0);
+  });
+  sbSaveSetting('master_volume', String(v));
+}
+function animatePH(id, dur) {
+  const ph = document.getElementById('ph_' + id); if (!ph) return;
+  ph.style.transition = 'none'; ph.style.width = '0%';
+  requestAnimationFrame(() => {
+    ph.style.transition = `width ${dur}s linear`;
+    ph.style.width = '100%';
+  });
+}
+function resetPH(id) {
+  const ph = document.getElementById('ph_' + id); if (!ph) return;
+  ph.style.transition = 'none'; ph.style.width = '0%';
+}
+
+// ── GLOBAL MODE ──
+function setGlobalMode(m) {
+  if (globalMode === m) {
+    globalMode = null;
+    document.getElementById('modeBtnOnce').classList.remove('active');
+    document.getElementById('modeBtnLoop').classList.remove('active');
+    document.getElementById('modeInd').textContent = 'BEBAS';
+  } else {
+    globalMode = m;
+    document.getElementById('modeBtnOnce').classList.toggle('active', m==='once');
+    document.getElementById('modeBtnLoop').classList.toggle('active', m==='loop');
+    document.getElementById('modeInd').textContent = m==='once' ? 'SEKALI' : 'ULANG';
+  }
+  renderStage();
+  sbSaveSetting('global_mode', globalMode || 'null');
+}
+
+// ── BOTTOM SHEET ──
+function openSheet(id) {
+  sheetTargetId = id;
+  const a = audioData.find(x => x.id === id);
+  document.getElementById('sheetTitle').textContent = a ? a.name : '—';
+  document.getElementById('sheetOverlay').classList.add('active');
+}
+function closeSheet() { document.getElementById('sheetOverlay').classList.remove('active'); }
+function sheetAction(act) {
+  closeSheet();
+  const id = sheetTargetId; if (!id) return;
+  const a  = audioData.find(x => x.id === id); if (!a) return;
+  if      (act==='once')       { stopAudio(id,false); a.mode='once'; triggerAudio(id); }
+  else if (act==='loop')       { stopAudio(id,false); a.mode='loop'; triggerAudio(id); }
+  else if (act==='stop')       { stopAudio(id); }
+  else if (act==='edit')       { openEditor(id); }
+  else if (act==='delete')     { deleteAudio(id); }
+  else if (act==='addMerge')   { addToMergeSelected(id); goTab('merge'); }
+  else if (act==='moveFolder') { openMoveFolderPrompt(id); }
+  else if (act==='rename') {
+    const n = prompt('Nama baru:', a.name);
+    if (n && n.trim()) {
+      a.name = n.trim();
+      renderLibrary(); renderStage(); renderMergeSourceList();
+      sbSaveAudio(a);
+    }
+  }
+}
+function openMoveFolderPrompt(id) {
+  const a = audioData.find(x => x.id === id); if (!a) return;
+  const opts   = ['(Tanpa Folder)', ...folders.map(f => f.name)];
+  const chosen = prompt(
+    'Pilih folder untuk "' + a.name + '":\n' +
+    opts.map((o, i) => i + '. ' + o).join('\n')
+  );
+  if (chosen === null) return;
+  const idx = parseInt(chosen);
+  if (isNaN(idx) || idx < 0 || idx > folders.length) { toast('Pilihan tidak valid', 'error'); return; }
+  a.folderId = idx === 0 ? null : folders[idx-1].id;
+  renderStage(); renderLibrary();
+  sbSaveAudio(a);
+  toast('✦ Audio dipindah', 'success');
+}
+
+// ============================================================
+//  AUDIO EDITOR
+// ============================================================
+function openEditor(id) {
+  const a = audioData.find(x => x.id === id);
+  if (!a || !a.buffer) { toast('Buffer audio tidak tersedia', 'error'); return; }
+  editorTargetId = id; editorBuffer = a.buffer; editorDuration = a.duration;
+  trimStart = a.trimStart || 0; trimEnd = a.trimEnd || a.duration;
+  document.getElementById('editorModalSub').textContent = a.name + ' · ' + fmtDur(a.duration) + ' total';
+  document.getElementById('trimStartInput').max = editorDuration;
+  document.getElementById('trimEndInput').max   = editorDuration;
+  document.getElementById('editorModal').classList.add('active');
+  setTimeout(() => { drawWaveform(); updateTrimOverlay(); }, 100);
+}
+function closeEditor() {
+  document.getElementById('editorModal').classList.remove('active');
+  if (editorPreviewSrc) { try { editorPreviewSrc.stop(); } catch(e){} editorPreviewSrc = null; }
+  editorTargetId = null; editorBuffer = null;
+}
+function drawWaveform() {
+  const canvas = document.getElementById('waveformCanvas');
+  const cont   = document.getElementById('waveformContainer');
+  const W = cont.clientWidth || 320, H = 80;
+  canvas.width = W; canvas.height = H;
+  const c = canvas.getContext('2d');
+  c.fillStyle = '#0a0805'; c.fillRect(0,0,W,H);
+  c.strokeStyle = '#2a2218'; c.lineWidth = 1;
+  [0,1,2,3,4].forEach(i => {
+    const y = (H/4)*i;
+    c.beginPath(); c.moveTo(0,y); c.lineTo(W,y); c.stroke();
+  });
+  if (!editorBuffer) return;
+  const data = editorBuffer.getChannelData(0);
+  const step = Math.ceil(data.length / W);
+  const mid  = H / 2;
+  const tL   = (trimStart / editorDuration) * W;
+  const tR   = (trimEnd   / editorDuration) * W;
+  for (let x=0; x<W; x++) {
+    let max = 0;
+    for (let j=0; j<step; j++) { const v=Math.abs(data[x*step+j]||0); if(v>max) max=v; }
+    const h = max * (H * 0.85);
+    c.fillStyle = (x>=tL && x<=tR) ? '#c9a84c' : '#3d3020';
+    c.fillRect(x, mid-h/2, 1, Math.max(1,h));
+  }
+  c.strokeStyle = 'rgba(201,168,76,0.2)'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(0,mid); c.lineTo(W,mid); c.stroke();
+}
+function updateTrimOverlay() {
+  const overlay = document.getElementById('trimOverlay');
+  overlay.style.left  = (trimStart / editorDuration * 100) + '%';
+  overlay.style.right = (100 - trimEnd / editorDuration * 100) + '%';
+  document.getElementById('trimStartInput').value = trimStart.toFixed(2);
+  document.getElementById('trimEndInput').value   = trimEnd.toFixed(2);
+  const dur = trimEnd - trimStart;
+  document.getElementById('trimDurationDisplay').textContent =
+    'Durasi potongan: ' + fmtDur(dur) + ' (' + dur.toFixed(2) + ' dtk)';
+  drawWaveform();
+}
+function trimInputChanged() {
+  let s = parseFloat(document.getElementById('trimStartInput').value) || 0;
+  let e = parseFloat(document.getElementById('trimEndInput').value)   || editorDuration;
+  s = Math.max(0, Math.min(s, editorDuration));
+  e = Math.max(0, Math.min(e, editorDuration));
+  if (s >= e) s = Math.max(0, e - 0.1);
+  trimStart = s; trimEnd = e; updateTrimOverlay();
+}
+function resetTrim() { trimStart=0; trimEnd=editorDuration; updateTrimOverlay(); }
+function previewTrim() {
+  if (!editorBuffer) return;
+  if (editorPreviewSrc) {
+    try { editorPreviewSrc.stop(); } catch(e){} editorPreviewSrc=null; return;
+  }
+  const ctx = getCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = editorBuffer;
+  const g = ctx.createGain(); g.gain.value = masterVolume;
+  src.connect(g); g.connect(ctx.destination);
+  src.start(0, trimStart, trimEnd - trimStart);
+  editorPreviewSrc = src;
+  src.onended = () => { editorPreviewSrc = null; };
+  toast('▶ Preview potongan...', 'default');
+}
+async function applyTrim() {
+  if (!editorTargetId || !editorBuffer) return;
+  const a = audioData.find(x => x.id === editorTargetId); if (!a) return;
+  if (trimStart >= trimEnd) { toast('Rentang tidak valid', 'error'); return; }
+  a.trimStart = trimStart; a.trimEnd = trimEnd;
+  if (editorPreviewSrc) { try { editorPreviewSrc.stop(); } catch(e){} editorPreviewSrc=null; }
+  closeEditor(); stopAudio(editorTargetId, false);
+  renderLibrary(); renderStage();
+  toast('✂ Potongan disimpan: ' + fmtDur(trimStart) + ' → ' + fmtDur(trimEnd), 'success');
+  setStatus('✂ Trim disimpan: ' + a.name, 'ok');
+  await sbSaveAudio(a);
+}
+function setupTrimHandles() {
+  function bindHandle(el, side) {
+    function onMove(clientX) {
+      const rect = document.getElementById('waveformContainer').getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const t    = pct * editorDuration;
+      if (side==='left') trimStart = Math.max(0, Math.min(t, trimEnd-0.1));
+      else               trimEnd   = Math.min(editorDuration, Math.max(t, trimStart+0.1));
+      updateTrimOverlay();
+    }
+    el.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const mv = ev => onMove(ev.touches[0].clientX);
+      const up = () => {
+        document.removeEventListener('touchmove', mv);
+        document.removeEventListener('touchend',  up);
+      };
+      document.addEventListener('touchmove', mv, { passive:false });
+      document.addEventListener('touchend',  up);
+    }, { passive:false });
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const mv = ev => onMove(ev.clientX);
+      const up = () => {
+        document.removeEventListener('mousemove', mv);
+        document.removeEventListener('mouseup',   up);
+      };
+      document.addEventListener('mousemove', mv);
+      document.addEventListener('mouseup',   up);
+    });
+  }
+  bindHandle(document.getElementById('trimHandleLeft'),  'left');
+  bindHandle(document.getElementById('trimHandleRight'), 'right');
+}
+
+// ============================================================
+//  MERGE COMPOSER
+// ============================================================
+function renderMergeSourceList() {
+  const el = document.getElementById('mergeSourceList');
+  if (!audioData.length) {
+    el.innerHTML = `<div style="font-family:'Courier Prime',monospace;font-size:9px;
+      letter-spacing:2px;color:var(--muted);text-align:center;padding:16px;
+      text-transform:uppercase;opacity:.5">Belum ada audio di library</div>`;
+    return;
+  }
+  el.innerHTML = audioData.map(a => `
+    <div class="merge-source-item ${mergeSelectedIds.includes(a.id)?'selected':''}"
+      onclick="toggleMergeSource('${a.id}')">
+      <div class="merge-source-check">${mergeSelectedIds.includes(a.id)?'✓':''}</div>
+      <div style="width:8px;height:8px;border-radius:50%;background:${a.color};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;color:var(--text);overflow:hidden;
+          text-overflow:ellipsis;white-space:nowrap">${a.name}</div>
+        <div style="font-family:'Courier Prime',monospace;font-size:9px;
+          color:var(--muted);letter-spacing:1px">
+          ${fmtDur((a.trimEnd||a.duration)-(a.trimStart||0))}</div>
+      </div>
+    </div>`).join('');
+  renderMergeQueue();
+  document.getElementById('btnMergeExec').disabled = mergeSelectedIds.length < 2;
+}
+function toggleMergeSource(id) {
+  const idx = mergeSelectedIds.indexOf(id);
+  if (idx >= 0) mergeSelectedIds.splice(idx, 1);
+  else          mergeSelectedIds.push(id);
+  renderMergeSourceList();
+}
+function addToMergeSelected(id) {
+  if (!mergeSelectedIds.includes(id)) mergeSelectedIds.push(id);
+  renderMergeSourceList();
+}
+function renderMergeQueue() {
+  const area = document.getElementById('mergeQueueArea');
+  if (!mergeSelectedIds.length) {
+    area.classList.add('empty');
+    area.innerHTML = '<span class="merge-queue-hint">Pilih audio di atas · · ·</span>';
+    return;
+  }
+  area.classList.remove('empty');
+  area.innerHTML = mergeSelectedIds.map((id, i) => {
+    const a = audioData.find(x => x.id === id); if (!a) return '';
+    return `<div class="merge-chip">
+      <div class="merge-chip-color" style="background:${a.color}"></div>
+      <span>${i+1}. ${a.name}</span>
+      <button class="merge-chip-remove" onclick="toggleMergeSource('${id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+async function executeMerge() {
+  if (mergeSelectedIds.length < 2) { toast('Pilih minimal 2 audio', 'error'); return; }
+  const label = document.getElementById('mergeLabelInput').value.trim() || 'Gabungan Audio';
+  const pw    = document.getElementById('mergeProgressWrap');
+  const pf    = document.getElementById('mergeProgressFill');
+  pw.style.display = 'block'; pf.style.width = '15%';
+  setStatus('Menggabungkan...', 'processing');
+  try {
+    const ctx     = getCtx();
+    const buffers = mergeSelectedIds.map(id => {
+      const a = audioData.find(x => x.id === id);
+      if (!a || !a.buffer) return null;
+      const s  = a.trimStart || 0, e = a.trimEnd || a.duration;
+      const sr = a.buffer.sampleRate;
+      const startSample = Math.floor(s * sr);
+      const numSamples  = Math.floor((e - s) * sr);
+      const chs         = a.buffer.numberOfChannels;
+      const trimmed     = ctx.createBuffer(chs, numSamples, sr);
+      for (let ch=0; ch<chs; ch++) {
+        const src2 = a.buffer.getChannelData(ch);
+        trimmed.getChannelData(ch).set(src2.subarray(startSample, startSample+numSamples));
+      }
+      return trimmed;
+    }).filter(Boolean);
+    pf.style.width = '40%';
+    const totalLen = buffers.reduce((s,b) => s+b.length, 0);
+    const chs      = Math.max(...buffers.map(b => b.numberOfChannels));
+    const sr       = buffers[0].sampleRate;
+    const merged   = ctx.createBuffer(chs, totalLen, sr);
+    pf.style.width = '65%';
+    let offset = 0;
+    for (const buf of buffers) {
+      for (let ch=0; ch<chs; ch++) {
+        merged.getChannelData(ch).set(
+          buf.getChannelData(Math.min(ch, buf.numberOfChannels-1)), offset
+        );
+      }
+      offset += buf.length;
+    }
+    pf.style.width = '85%';
+    const offlineCtx = new OfflineAudioContext(chs, totalLen, sr);
+    const srcNode    = offlineCtx.createBufferSource();
+    srcNode.buffer   = merged;
+    srcNode.connect(offlineCtx.destination);
+    srcNode.start();
+    const renderedBuf  = await offlineCtx.startRendering();
+    const mergedArrBuf = audioBufferToWav(renderedBuf);
+    const id          = 'merged_' + Date.now();
+    const names       = mergeSelectedIds.map(sid => audioData.find(a=>a.id===sid)?.name).filter(Boolean);
+    const storagePath = currentUser.id + '/' + id + '.wav';
+    const entry = {
+      id, name: label, buffer: merged, duration: merged.duration,
+      color: mergeSelColor, mode: 'once', isMerged: true,
+      trimStart: 0, trimEnd: merged.duration, sourceNames: names,
+      storagePath, folderId: null, volume: 1.0
+    };
+    audioData.push(entry);
+    pf.style.width = '92%';
+    await sbStorageUpload(storagePath, mergedArrBuf, 'audio/wav');
+    setTimeout(() => { pw.style.display='none'; pf.style.width='0%'; }, 700);
+    mergeSelectedIds = [];
+    document.getElementById('mergeLabelInput').value = '';
+    renderLibrary(); renderStage(); renderMergeSourceList(); updateCount();
+    setStatus('✦ Merge selesai: ' + label, 'ok');
+    goTab('stage');
+    const ok = await sbSaveAudio(entry);
+    toast('✦ Merge berhasil: ' + label + (ok?' ☁':''), ok?'success':'error');
+  } catch(err) {
+    pw.style.display = 'none';
+    toast('Gagal merge: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+function audioBufferToWav(buffer) {
+  const numCh      = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const numFrames  = buffer.length;
+  const blockAlign = numCh * 2;
+  const dataSize   = numFrames * blockAlign;
+  const ab         = new ArrayBuffer(44 + dataSize);
+  const view       = new DataView(ab);
+  function writeStr(o, s) { for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); }
+  writeStr(0,'RIFF'); view.setUint32(4,36+dataSize,true); writeStr(8,'WAVE');
+  writeStr(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true);
+  view.setUint16(22,numCh,true); view.setUint32(24,sampleRate,true);
+  view.setUint32(28,sampleRate*blockAlign,true); view.setUint16(32,blockAlign,true);
+  view.setUint16(34,16,true); writeStr(36,'data'); view.setUint32(40,dataSize,true);
+  let offset = 44;
+  for (let i=0; i<numFrames; i++) {
+    for (let ch=0; ch<numCh; ch++) {
+      const s2 = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+      view.setInt16(offset, s2<0?s2*0x8000:s2*0x7FFF, true);
+      offset += 2;
+    }
+  }
+  return ab;
+}
+
+// ============================================================
+//  SUPABASE DB
+// ============================================================
+async function sbSaveAudio(a) {
+  try {
+    setSbStatus('loading');
+    await sbFetch('audio_library', {
+      method: 'POST',
+      extraHeaders: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({
+        id:           a.id,
+        user_id:      currentUser.id,
+        name:         a.name,
+        color:        a.color,
+        mode:         a.mode,
+        duration:     parseFloat(a.duration.toFixed(4)),
+        trim_start:   parseFloat((a.trimStart||0).toFixed(4)),
+        trim_end:     parseFloat((a.trimEnd||a.duration).toFixed(4)),
+        is_merged:    !!a.isMerged,
+        source_names: a.sourceNames || null,
+        storage_path: a.storagePath || null,
+        folder_id:    a.folderId    || null,
+        volume:       parseFloat((a.volume!=null?a.volume:1.0).toFixed(4))
+      })
+    });
+    setSbStatus('ok');
+    return true;
+  } catch(err) {
+    console.error('[SB] sbSaveAudio:', err);
+    setSbStatus('err');
+    if (!hasInternet()) showBanner('error','❌ Tidak ada internet. Data belum tersimpan.',true);
+    else showBanner('warn','⚠ Gagal sync: '+err.message.substring(0,60),true);
+    return false;
+  }
+}
+async function sbDeleteAudio(id) {
+  try {
+    await sbFetch('audio_library?id=eq.'+encodeURIComponent(id), { method:'DELETE' });
+    setSbStatus('ok');
+  } catch(err) { console.error('[SB] sbDeleteAudio:', err); setSbStatus('err'); }
+}
+async function sbSaveFolder(f) {
+  try {
+    await sbFetch('folders', {
+      method: 'POST',
+      extraHeaders: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({
+        id:         f.id,
+        user_id:    currentUser.id,
+        name:       f.name,
+        color:      f.color,
+        sort_order: f.sort_order || 0
+      })
+    });
+    return true;
+  } catch(err) { console.error('[SB] sbSaveFolder:', err); return false; }
+}
+async function sbDeleteFolder(id) {
+  try {
+    await sbFetch('folders?id=eq.'+encodeURIComponent(id), { method:'DELETE' });
+  } catch(err) { console.error('[SB] sbDeleteFolder:', err); }
+}
+async function sbSaveSetting(key, value) {
+  try {
+    await sbFetch('app_settings', {
+      method: 'POST',
+      extraHeaders: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ key, value, user_id: currentUser.id })
+    });
+  } catch(err) { console.warn('[SB] sbSaveSetting:', err); }
+}
+function setSbStatus(state) {
+  const dot = document.getElementById('sbDot');
+  const lbl = document.getElementById('sbLabel');
+  dot.className = 'sb-dot';
+  if      (state==='ok')      { dot.classList.add('ok');      lbl.textContent='DB ✓'; }
+  else if (state==='err')     { dot.classList.add('err');     lbl.textContent='DB ✗'; }
+  else if (state==='loading') { dot.classList.add('loading'); lbl.textContent='DB...'; }
+}
+
+// ============================================================
+//  RESTORE — Load dari Supabase Storage
+// ============================================================
+function buildAudioEntry(row, decoded) {
+  return {
+    id:          row.id,
+    name:        row.name,
+    color:       row.color          || '#c9a84c',
+    mode:        row.mode           || 'once',
+    duration:    decoded.duration,
+    trimStart:   parseFloat(row.trim_start) || 0,
+    trimEnd:     parseFloat(row.trim_end)   || decoded.duration,
+    isMerged:    !!row.is_merged,
+    sourceNames: row.source_names   || null,
+    storagePath: row.storage_path,
+    folderId:    row.folder_id      || null,
+    volume:      parseFloat(row.volume)     || 1.0,
+    buffer:      decoded
+  };
+}
+
+async function downloadAudioFile(storagePath) {
+  const headers = { 'Authorization': 'Bearer ' + authToken, 'apikey': SB_KEY };
+
+  // Metode 1: authenticated
+  try {
+    const res = await fetch(
+      SB_URL + '/storage/v1/object/authenticated/audio-files/' + storagePath,
+      { headers }
+    );
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 0) { console.log('[DL] ✓ auth:', storagePath); return buf; }
+    }
+  } catch(e) { console.warn('[DL] auth error:', e.message); }
+
+  // Metode 2: direct
+  try {
+    const res = await fetch(
+      SB_URL + '/storage/v1/object/audio-files/' + storagePath,
+      { headers }
+    );
+    if (res.ok) {
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 0) { console.log('[DL] ✓ direct:', storagePath); return buf; }
+    }
+  } catch(e) { console.warn('[DL] direct error:', e.message); }
+
+  // Metode 3: signed URL
+  try {
+    const signRes = await fetch(
+      SB_URL + '/storage/v1/object/sign/audio-files/' + storagePath, {
+      method:  'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ expiresIn: 3600 })
+    });
+    if (signRes.ok) {
+      const sd  = await signRes.json();
+      const url = sd.signedURL
+        ? (sd.signedURL.startsWith('http') ? sd.signedURL : SB_URL + '/storage/v1' + sd.signedURL)
+        : null;
+      if (url) {
+        const res = await fetch(url);
+        if (res.ok) {
+          const buf = await res.arrayBuffer();
+          if (buf.byteLength > 0) { console.log('[DL] ✓ signed:', storagePath); return buf; }
+        }
+      }
+    }
+  } catch(e) { console.warn('[DL] signed error:', e.message); }
+
+  throw new Error('Semua metode download gagal: ' + storagePath);
+}
+
+async function restoreAll() {
+  try {
+    setSbStatus('loading');
+    setStatus('Memuat data...', 'processing');
+
+    if (!hasInternet()) {
+      setSbStatus('err');
+      setStatus('Tidak ada koneksi internet', 'error');
+      showBanner('error', '❌ Tidak ada koneksi internet. Data tidak bisa dimuat.', true);
+      return;
+    }
+
+    // Load folders
+    const folderRows = await sbFetch(
+      'folders?select=*&user_id=eq.' + currentUser.id + '&order=sort_order.asc'
+    );
+    folders = (folderRows || []).map(r => ({
+      id:         r.id,
+      name:       r.name,
+      color:      r.color || '#c9a84c',
+      sort_order: r.sort_order || 0
+    }));
+    folders.forEach(f => openFolderIds.add(f.id));
+
+    // Load audio metadata
+    const rows = await sbFetch(
+      'audio_library?select=*&user_id=eq.' + currentUser.id + '&order=created_at.asc'
+    );
+    setSbStatus('ok');
+
+    if (!rows || !rows.length) {
+      setStatus('Siap — Upload audio untuk memulai', 'ok');
+      showBanner('ok', '✦ Terhubung. Belum ada audio tersimpan.', false);
+      setTimeout(() => closeBanner(), 3000);
+      renderLibrary(); renderStage(); updateCount();
+      return;
+    }
+
+    setStatus('Memuat ' + rows.length + ' audio...', 'processing');
+    showBanner('warn', '↺ Memuat ' + rows.length + ' audio dari server...', false);
+
+    const ctx    = getCtx();
+    let restored = 0;
+    let failed   = 0;
+
+    async function loadOne(row) {
+      if (!row.storage_path) { failed++; return; }
+      try {
+        const arrBuf  = await downloadAudioFile(row.storage_path);
+        const decoded = await ctx.decodeAudioData(arrBuf);
+        audioData.push(buildAudioEntry(row, decoded));
+        restored++;
+        console.log('[Load] ✓', row.name);
+      } catch(e) {
+        console.warn('[Load] ✗', row.name, '—', e.message);
+        failed++;
+      }
+    }
+
+    // Batch 4 concurrent
+    const BATCH = 4;
+    for (let i=0; i<rows.length; i+=BATCH) {
+      await Promise.all(rows.slice(i, i+BATCH).map(loadOne));
+      renderLibrary(); renderStage(); updateCount();
+      setStatus('Memuat ' + Math.min(i+BATCH,rows.length) + '/' + rows.length + '...', 'processing');
+    }
+
+    renderLibrary(); renderStage(); updateCount();
+
+    if (failed === 0) {
+      setSbStatus('ok');
+      setStatus('✦ ' + restored + ' audio berhasil dimuat', 'ok');
+      showBanner('ok', '✦ ' + restored + ' audio berhasil dimuat.', false);
+      setTimeout(() => closeBanner(), 3000);
+    } else {
+      setSbStatus('err');
+      setStatus(restored + ' dimuat · ' + failed + ' gagal', 'ok');
+      showBanner('warn', '⚠ ' + restored + ' dimuat, ' + failed + ' gagal. Buka Diagnosis untuk detail.', true);
+    }
+
+  } catch(err) {
+    console.error('[Restore]', err);
+    setSbStatus('err');
+    if (!hasInternet()) {
+      setStatus('Tidak ada koneksi internet', 'error');
+      showBanner('error', '❌ Tidak ada koneksi internet.', true);
+    } else {
+      setStatus('Gagal koneksi database', 'error');
+      showBanner('error', '❌ Gagal load data: ' + err.message.substring(0,80) + '. Ketuk COBA LAGI.', true);
+    }
+  }
+}
+
+async function loadSettings() {
+  try {
+    const settings = await sbFetch(
+      'app_settings?select=key,value&user_id=eq.' + currentUser.id
+    );
+    if (!settings) return;
+    settings.forEach(r => {
+      if (r.key === 'master_volume') {
+        const v = parseFloat(r.value) || 0.8;
+        masterVolume = v;
+        document.getElementById('masterVol').value = v;
+      }
+      if (r.key === 'global_mode' && r.value && r.value !== 'null') {
+        globalMode = r.value;
+        document.getElementById('modeBtnOnce').classList.toggle('active', r.value==='once');
+        document.getElementById('modeBtnLoop').classList.toggle('active', r.value==='loop');
+        document.getElementById('modeInd').textContent = r.value==='once' ? 'SEKALI' : 'ULANG';
+      }
+    });
+  } catch(err) { console.warn('[Settings]', err); }
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function fmtDur(s) {
+  if (isNaN(s)||s<0) s=0;
+  return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
+}
+function setStatus(txt, state) {
+  document.getElementById('statusTxt').textContent = txt;
+  const dot = document.getElementById('statusDot');
+  const map = { playing:'#3ea87a', error:'#c0392b', processing:'#c9a84c' };
+  dot.style.background = map[state] || '#3ea87a';
+  dot.style.boxShadow  = '0 0 5px ' + dot.style.background;
+}
+function updateCount() {
+  document.getElementById('statusCount').textContent =
+    audioData.length ? audioData.length + ' AUDIO' : '';
+}
+function toast(msg, type='default') {
+  const wrap = document.getElementById('toastWrap');
+  const el   = document.createElement('div');
+  el.className   = 'toast ' + type;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity   = '0';
+    el.style.transform = 'translateY(-8px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3200);
+}
+
+// ── BUILD COLOR GRIDS ──
+buildColors('modalColorGrid',  modalSelColor,  c => modalSelColor  = c);
+buildColors('mergeColorGrid',  mergeSelColor,  c => mergeSelColor  = c);
+buildColors('folderColorGrid', folderSelColor, c => folderSelColor = c);
+
+// ============================================================
+//  INIT
+// ============================================================
+async function initApp() {
+  setupConnMonitor();
+  setupTrimHandles();
+  await loadSettings();
+  await restoreAll();
+}
+
+window.addEventListener('load', () => {
+  if (!checkSession()) {
+    document.getElementById('authScreen').classList.remove('hidden');
+    setTimeout(() => checkAuthScreenConn(), 800);
+  }
+  document.getElementById('loginPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('regPassword2').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doRegister();
+  });
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('[SW] Registered'))
+      .catch(err => console.warn('[SW] Error:', err));
+  });
+}
+</script>
+</body>
+</html>
